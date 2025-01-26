@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-mongoose.connect("mongodb://localhost:27017/scatch")
+mongoose.connect(`${process.env.MONGODB_URL}/scatch`)
 .then(function(){
     console.log('MongoDb connected')
 })

@@ -5,9 +5,8 @@ const connection = require('./config/mongoose.connection.js')
 const ownersRouter = require('./routes/ownersRouter.route.js')
 const usersRouter = require('./routes/usersRouter.route.js')
 const productsRouter = require('./routes/productsRouter.route.js')
-
+const index = require('./routes/index.js')
 const app = express()
-
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -20,6 +19,8 @@ app.set('view engine','ejs')
 app.use('/owners',ownersRouter)
 app.use('/users',usersRouter)
 app.use('/products',productsRouter)
+app.use('/',index)
+
 app.listen(8000,()=>{
     console.log('app is on 8000')
 })
