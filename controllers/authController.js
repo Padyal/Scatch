@@ -2,14 +2,15 @@ const userModel = require('../models/user.model')
 const bcrypt = require('bcrypt')
 const cookie = require('cookie-parser')
 const tokenGenerator = require('../utils/generatToken')
+const generateToken = require('../utils/generatToken')
 
 module.exports.registerUser = async function(req,res){
     try{
         const {email,password,fullname} = req.body
 
-        const prevUser = await userModel.findOne({email:email})
+        const prevUser = await userModel.findOne({$or:[{email},{fullname}]})
 
-        if(prevUser) return res.status(401).send('User already exist')
+        if(prevUser) return res.status(401).send('User already exist with same cred')
 
         bcrypt.genSalt(10,function(err,salt){
             if(err) return res.send(err.message)
@@ -32,4 +33,24 @@ module.exports.registerUser = async function(req,res){
         res.send(err.message)
     }
      
+}
+
+module.exports.loginUser = async function(req,res){
+    const {email,password} = req.body;
+
+    const prevUser = await userModel.findOne({email})
+
+    if(!prevUser) return res.status('401').send('Email or password incorrect')
+    
+    bcrypt.compare(password,prevUser.password,function(err,result){
+        if(err) return res.send(err.message)
+        
+        if(result){
+            const token = generateToken(prevUser)
+            res.cookie("token",token)
+            res.status(200).render('shop')
+        }else{
+            res.send('Email or password in correct')
+        }
+    })
 }
